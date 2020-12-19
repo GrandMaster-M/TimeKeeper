@@ -161,18 +161,37 @@ def getEmails():
 getEmails()
 
 
-#my code 
-#scopes = ['https://www.googleapis.com/auth/calendar']
-#flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", scopes=scopes)
-#credentials = flow.run_console()0
-#pickle.dump(credentials, open("token1.pkl", "wb"))
-#credentials = pickle.load(open("token1.pkl", "rb"))
-#service = build("calendar", "v3", credentials=credentials)
-def create_event(start_time_str, summary,id, duration=1, description=None, location=None):
-        event = {
-            'summary': summary,
-            'location': location,
-            'description': description,
+
+
+def calendarz():
+    creds = None
+
+    # The file token.pickle contains the user access token.
+    # Check if it exists
+    if os.path.exists('token.pickle'):
+
+        # Read the token from the file and store it in the variable creds
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    # If credentials are not available or are invalid, ask the user to log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+
+        # Save the access token in token.pickle file for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    service = build("calendar", "v3", credentials=creds)
+    start_time = datetime(2020, 12, 23, 19, 30, 0)
+    end_time = start_time + timedelta(hours=1)
+    event = {
+            'summary': 'hiya',
+            'location': '',
+            'description': '',
             'start': {
                 'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
                 'timeZone': 'Asia/Kolkata',
@@ -184,16 +203,11 @@ def create_event(start_time_str, summary,id, duration=1, description=None, locat
             'reminders': {
                 'useDefault': False,
                 'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
                     {'method': 'popup', 'minutes': 10},
                 ],
             },
         }
-        return service.events().insert(calendarId=id, body=event).execute()
-
-def calendarz():
-    service1 = build('gmail', 'v1', credentials=creds)
-    result = service1.calendarList().list().execute()
-    calendar_id = result['items'][0]['id']
-    create_event(" 22 december 5 pm","Meeting",calendar_id)
+    service.events().insert(calendarId='primary', body=event).execute()
 
 calendarz()
