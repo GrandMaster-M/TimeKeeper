@@ -1,0 +1,18 @@
+{
+
+"manifest_version": 2,
+"name": "TimeKeeper",
+"version": "1.0",
+"permissions": [
+    "https://mail.google.com/", "activeTab"
+],
+
+"browser_action": {
+  "default_icon": "calr19.jpg",
+  "default_popup": "popup.html"
+},
+
+"icons": {
+  "128": "calre128.jpg"
+}
+}
