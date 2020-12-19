@@ -10,8 +10,11 @@ import email
 from bs4 import BeautifulSoup
 import re
 
+
+from datetime import datetime, timedelta
+
 # Define the SCOPES. If modifying it, delete the token.pickle file.
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly','https://www.googleapis.com/auth/calendar']
 
 def courses(course):
     res = re.findall(r'\w+', course)
@@ -156,3 +159,41 @@ def getEmails():
 
 
 getEmails()
+
+
+#my code 
+#scopes = ['https://www.googleapis.com/auth/calendar']
+#flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", scopes=scopes)
+#credentials = flow.run_console()0
+#pickle.dump(credentials, open("token1.pkl", "wb"))
+#credentials = pickle.load(open("token1.pkl", "rb"))
+#service = build("calendar", "v3", credentials=credentials)
+def create_event(start_time_str, summary,id, duration=1, description=None, location=None):
+        event = {
+            'summary': summary,
+            'location': location,
+            'description': description,
+            'start': {
+                'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                'timeZone': 'Asia/Kolkata',
+            },
+            'end': {
+            'dateTime': end_time.strftime("%Y-%m-%dT%H:%M:%S"),
+            'timeZone': 'Asia/Kolkata',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+        }
+        return service.events().insert(calendarId=id, body=event).execute()
+
+def calendarz():
+    service1 = build('gmail', 'v1', credentials=creds)
+    result = service1.calendarList().list().execute()
+    calendar_id = result['items'][0]['id']
+    create_event(" 22 december 5 pm","Meeting",calendar_id)
+
+calendarz()
